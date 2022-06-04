@@ -85,7 +85,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/user/get-joined-study-groups",
                         "/user/get-info",
                         "/user/edit",
-                        "/study-group/delete-member"
+                        "/study-group/delete-member",
+                        "/user/is-authenticated"
                         ).hasAnyRole("USER").
                 anyRequest()
                 .authenticated()

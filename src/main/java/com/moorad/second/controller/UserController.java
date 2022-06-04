@@ -185,4 +185,8 @@ public class UserController {
         return ResponseEntity.ok(false);
     }
 
+    @GetMapping("/is-authenticated")
+    public HttpEntity<?> isAuthenticated(){
+        return ResponseEntity.ok(true);
+    }
 }
