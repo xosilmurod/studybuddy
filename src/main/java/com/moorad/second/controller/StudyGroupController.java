@@ -3,6 +3,7 @@ package com.moorad.second.controller;
 import com.moorad.second.entity.Interest;
 import com.moorad.second.entity.StudyGroup;
 import com.moorad.second.entity.User;
+import com.moorad.second.payload.request.ReqInterestIds;
 import com.moorad.second.payload.request.ReqStudyGroup;
 import com.moorad.second.repository.InterestRepository;
 import com.moorad.second.repository.StudyGroupRepository;
@@ -90,11 +91,11 @@ public class StudyGroupController {
             @RequestParam int size,
             @RequestParam String search,
             @RequestParam String sort,
-            @RequestBody ArrayList<UUID> interests){
+            @RequestBody ReqInterestIds reqInterestIds){
         if ("hottest".equals(sort)){sort="count";}else {sort="created";}
 
         List<Interest> userInterests=new ArrayList<>();
-        Iterable<UUID> iterable=interests;
+        Iterable<UUID> iterable=reqInterestIds.getData();
         List<Interest> selectedCategories = interestRepository.findAllById(iterable);
         Pageable pageable= PageRequest.of(page-1, size, Sort.by(sort));
 
