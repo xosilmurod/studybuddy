@@ -34,6 +34,7 @@ public class StudyGroupController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+
     @GetMapping("/get-info/{id}")
     public HttpEntity<?> getGroupInfo(@PathVariable UUID id){
         Optional<StudyGroup> optionalStudyGroup = studyGroupRepository.findById(id);
@@ -61,24 +62,29 @@ public class StudyGroupController {
     @PutMapping("/edit/{id}")
     public HttpEntity<?> editGroup(@PathVariable UUID id, @RequestBody ReqStudyGroup reqStudyGroup){
         try {
+            //is creator check
+            User loggedUser = userDetailsService.getLoggedUser();
             StudyGroup studyGroup = studyGroupRepository.findById(id).get();
             Interest interest = interestRepository.findById(reqStudyGroup.getInterestId()).get();
 
-            studyGroup.setContacts(reqStudyGroup.getContacts());
-            studyGroup.setInterest(interest);
-            studyGroup.setDescription(reqStudyGroup.getDescription());
-            studyGroup.setName(reqStudyGroup.getName());
-            studyGroup.setRequirement(reqStudyGroup.getRequirement());
+            if(studyGroup.getCreator().getUsername().equals(loggedUser.getUsername())){
+                studyGroup.setContacts(reqStudyGroup.getContacts());
+                studyGroup.setInterest(interest);
+                studyGroup.setDescription(reqStudyGroup.getDescription());
+                studyGroup.setName(reqStudyGroup.getName());
+                studyGroup.setRequirement(reqStudyGroup.getRequirement());
 
-            studyGroupRepository.save(studyGroup);
-            return ResponseEntity.ok(true);
+                studyGroupRepository.save(studyGroup);
+                return ResponseEntity.ok(true);
+            }
+            return ResponseEntity.ok(false);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(false);
         }
     }
 
-    @GetMapping("/feed")
+    @PostMapping("/feed")
     public HttpEntity<?> feed(
             @RequestParam int page,
             @RequestParam int size,

@@ -5,10 +5,7 @@ import com.moorad.second.entity.Role;
 import com.moorad.second.entity.StudyGroup;
 import com.moorad.second.entity.User;
 import com.moorad.second.entity.enums.RoleName;
-import com.moorad.second.payload.request.ReqLogin;
-import com.moorad.second.payload.request.ReqRegister;
-import com.moorad.second.payload.request.ReqStudyGroup;
-import com.moorad.second.payload.request.ReqUserEdit;
+import com.moorad.second.payload.request.*;
 import com.moorad.second.repository.InterestRepository;
 import com.moorad.second.repository.RoleRepository;
 import com.moorad.second.repository.StudyGroupRepository;
@@ -71,9 +68,14 @@ public class UserController {
                     passwordEncoder.encode(reqRegister.getPassword())
             );
 
-            userRepository.save(user);
+            User save = userRepository.save(user);
+            // new code
+            Authentication authenticate = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(save.getUsername(), reqRegister.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authenticate);
+            String generateToken = jwtTokenProvider.generateJwtToken(authenticate);
+            return ResponseEntity.ok("StudyBuddy "+generateToken);
 
-            return ResponseEntity.ok(true);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(false);
@@ -90,7 +92,9 @@ public class UserController {
     }
 
     @PostMapping("/add-interest")
-    public HttpEntity<?> addInterest(@RequestBody List<UUID> ids){
+    public HttpEntity<?> addInterest(@RequestBody ReqInterestIds reqInterestIds){
+        List<UUID> ids=reqInterestIds.getData();
+
         try {
             User loggedUser = userDetailsService.getLoggedUser();
             Iterable<UUID> iterable = ids;
@@ -104,10 +108,12 @@ public class UserController {
         }
     }
 
+    //not tested
     @PostMapping("/create-study-group")
     public HttpEntity<?> createStudyGroup(@RequestBody ReqStudyGroup reqStudyGroup){
         try {
             User loggedUser = userDetailsService.getLoggedUser();
+
             Interest interest = interestRepository.findById(reqStudyGroup.getInterestId()).get();
             LocalDate localDate=LocalDate.now();
             List<User> members=new ArrayList<>();
@@ -123,8 +129,8 @@ public class UserController {
                     interest
             ));
             save.setCount(save.getMembers().size());
-            studyGroupRepository.save(save);
-            return ResponseEntity.ok(true);
+            StudyGroup response = studyGroupRepository.save(save);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(false);
@@ -189,4 +195,20 @@ public class UserController {
     public HttpEntity<?> isAuthenticated(){
         return ResponseEntity.ok(true);
     }
+
+    @GetMapping("/is-creator")
+    public HttpEntity<?> isCreator(@RequestParam UUID groupId){
+        try {
+            User loggedUser = userDetailsService.getLoggedUser();
+            StudyGroup studyGroup = studyGroupRepository.findById(groupId).get();
+            if(studyGroup.getCreator().getUsername().equals(loggedUser.getUsername())){
+                return ResponseEntity.ok(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok(false);
+    }
+
+
 }

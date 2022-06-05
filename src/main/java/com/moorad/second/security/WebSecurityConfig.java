@@ -86,9 +86,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/user/get-info",
                         "/user/edit",
                         "/study-group/delete-member",
-                        "/user/is-authenticated"
-                        ).hasAnyRole("USER").
-                anyRequest()
+                        "/user/is-authenticated",
+                        "/is-creator"
+                        ).hasAnyRole("USER", "ADMIN").
+                antMatchers(
+                        "/interest/create"
+                ).hasAnyRole("ADMIN")
+                .anyRequest()
                 .authenticated()
                 .and()
                 .cors();

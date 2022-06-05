@@ -47,7 +47,7 @@ public class DataLoader implements CommandLineRunner {
 
         if (initialMode.equalsIgnoreCase("always")){
             List<Role> roles = roleRepository.saveAll(Arrays.asList(
-                    new Role(RoleName.ROLE_USER)
+                    new Role(RoleName.ROLE_ADMIN)
             ));
             Set<Role> setRoles = new HashSet<>(roles);
 

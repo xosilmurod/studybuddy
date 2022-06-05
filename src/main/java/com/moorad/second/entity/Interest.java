@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "cateogory", uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @EqualsAndHashCode(callSuper = true)
 
 @AllArgsConstructor

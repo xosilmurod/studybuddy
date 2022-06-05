@@ -2,13 +2,12 @@ package com.moorad.second.controller;
 
 
 import com.moorad.second.entity.Interest;
+import com.moorad.second.payload.request.ReqInterest;
 import com.moorad.second.repository.InterestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,5 +21,16 @@ public class InterestController {
     public HttpEntity<?> getInterests(){
         List<Interest> interests = interestRepository.findAll();
         return ResponseEntity.ok(interests);
+    }
+
+    @PostMapping("/create")
+    public HttpEntity<?> createStudyGroup(@RequestBody ReqInterest reqInterest){
+        try {
+            Interest save = interestRepository.save(new Interest(reqInterest.getName()));
+            return ResponseEntity.ok(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(false);
+        }
     }
 }
